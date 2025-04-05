@@ -20,6 +20,10 @@ export const authUser = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        console.log("Decoded Token:", decoded); // Log decoded token for debugging
+        if (!decoded.email) {
+            throw new Error("Token missing email field");
+        }
         req.user = decoded;
         next();
     } catch (error) {

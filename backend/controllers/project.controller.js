@@ -27,6 +27,8 @@ export const createProject = async (req, res) => {
         res.status(400).send(err.message);
     }
 
+
+
 }
 
 export const getAllProject = async (req, res) => {
@@ -48,7 +50,7 @@ export const getAllProject = async (req, res) => {
         console.log(err)
         res.status(400).json({ error: err.message })
     }
-} 
+}
 
 export const addUserToProject = async (req, res) => {
     const errors = validationResult(req);

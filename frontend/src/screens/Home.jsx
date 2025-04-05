@@ -28,15 +28,14 @@ const Home = () => {
             })
     }
 
-    // useEffect(() => {
-    //     axios.get('/projects/all').then((res) => {
-    //         setProject(res.data.projects)
+    useEffect(() => {
+        axios.get('/projects/all').then((res) => {
+            setProject(res.data.projects)
+        }).catch(err => {
+            console.log(err)
+        })
 
-    //     }).catch(err => {
-    //         console.log(err)
-    //     })
-
-    // }, [])
+    }, [])
 
     return (
         <main className='p-4'>
@@ -48,7 +47,7 @@ const Home = () => {
                     <i className="ri-link ml-2"></i>
                 </button>
 
-                {/* {
+                {
                     project.map((project) => (
                         <div key={project._id}
                             onClick={() => {
@@ -68,7 +67,7 @@ const Home = () => {
 
                         </div>
                     ))
-                } */}
+                }
 
 
             </div>
