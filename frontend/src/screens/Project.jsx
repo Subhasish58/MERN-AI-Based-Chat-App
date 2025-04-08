@@ -124,18 +124,25 @@ const Project = () => {
         receiveMessage('project-message', data => {
 
             console.log(data)
+            
+            if (data.sender._id == 'ai') {
 
-            const message = JSON.parse(data.message)
 
-            console.log(message)
+                const message = JSON.parse(data.message)
 
-            webContainer?.mount(message.fileTree)
+                console.log(message)
 
-            if (message.fileTree) {
-                setFileTree(message.fileTree)
+                webContainer?.mount(message.fileTree)
+
+                if (message.fileTree) {
+                    setFileTree(message.fileTree || {})
+                }
+                setMessages(prevMessages => [ ...prevMessages, data ]) // Update messages state
+            } else {
+
+
+                setMessages(prevMessages => [ ...prevMessages, data ]) // Update messages state
             }
-
-            setMessages(prevMessages => [ ...prevMessages, data ]) // Update messages state
         })
 
 
@@ -144,6 +151,7 @@ const Project = () => {
             console.log(res.data.project)
 
             setProject(res.data.project)
+            setFileTree(res.data.project.fileTree || {})
         })
 
         axios.get('/users/all').then(res => {
@@ -157,6 +165,17 @@ const Project = () => {
         })
 
     }, [])
+
+    function saveFileTree(ft) {
+        axios.put('/projects/update-file-tree', {
+            projectId: project._id,
+            fileTree: ft
+        }).then(res => {
+            console.log(res.data)
+        }).catch(err => {
+            console.log(err)
+        })
+    }
 
 
     // Removed appendIncomingMessage and appendOutgoingMessage functions
@@ -298,7 +317,6 @@ const Project = () => {
                                         runProcess.kill()
                                     }
 
-
                                     let tempRunProcess = await webContainer.spawn("npm", [ "start" ]);
 
                                     tempRunProcess.output.pipeTo(new WritableStream({
@@ -335,16 +353,16 @@ const Project = () => {
                                             suppressContentEditableWarning
                                             onBlur={(e) => {
                                                 const updatedContent = e.target.innerText;
-                                                setFileTree(prevFileTree => ({
-                                                    ...prevFileTree,
+                                                const ft = {
+                                                    ...fileTree,
                                                     [ currentFile ]: {
-                                                        ...prevFileTree[ currentFile ],
                                                         file: {
-                                                            ...prevFileTree[ currentFile ].file,
                                                             contents: updatedContent
                                                         }
                                                     }
-                                                }));
+                                                }
+                                                setFileTree(ft)
+                                                saveFileTree(ft)
                                             }}
                                             dangerouslySetInnerHTML={{ __html: hljs.highlight('javascript', fileTree[ currentFile ].file.contents).value }}
                                             style={{
